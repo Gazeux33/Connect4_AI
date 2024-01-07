@@ -1,4 +1,6 @@
 import random
+from copy import deepcopy
+
 import pygame
 import sys
 
@@ -19,6 +21,7 @@ class Connect4:
         self._board = None
         self._current_turn = None
         self.reset()
+        self.last_move = None
 
         self.clock = pygame.time.Clock()
         self.screen = pygame.display.set_mode((700, 600))
@@ -100,7 +103,8 @@ class Connect4:
             # Diagonal up-right
             for i in range(-3, 1):
                 if c + i >= 0 and r - i - 3 >= 0 and c + i + 3 < self._cols and r - i < self._rows:
-                    if all(0 <= r - i - j < self._rows and 0 <= c + i + j < self._cols and self._board[r - i - j][c + i + j] == player for j in range(4)):
+                    if all(0 <= r - i - j < self._rows and 0 <= c + i + j < self._cols and self._board[r - i - j][
+                        c + i + j] == player for j in range(4)):
                         return player
 
         # Draw check
@@ -110,7 +114,9 @@ class Connect4:
         return None
 
     def make_move(self, column):
-        self._board[self.next_empty_position(column)][column] = self._current_turn
+        r = self.next_empty_position(column)
+        self._board[r][column] = self._current_turn
+        self.last_move = r, column
 
     def get_free_columns(self):
         return [i for i in range(7) if self._board[0][i] == 0]
@@ -133,8 +139,8 @@ class Connect4:
             return RED_COLOR
         return EMPTY_COLOR
 
-    def get_state(self):
-        return self._board
+    def copy_state(self):
+        return deepcopy(self)
 
     def set_board(self, board):
         self._board = board
@@ -146,6 +152,8 @@ class Connect4:
                     if self.check_win((i, j)) is not None:
                         return True
         return False
+
+
 
 
 if __name__ == '__main__':
