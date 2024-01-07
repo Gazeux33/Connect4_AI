@@ -42,7 +42,7 @@ class Connect4:
                         next_empty_position = self.next_empty_position(column)
                         if next_empty_position is not None:
                             if next_empty_position is not None:
-                                self._board[next_empty_position][column] = self._current_turn
+                                self.make_move(column)
                                 result = self.check_win((next_empty_position, column))
                                 print(result)
                             if result is not None:
@@ -109,6 +109,12 @@ class Connect4:
 
         return None
 
+    def make_move(self, column):
+        self._board[self.next_empty_position(column)][column] = self._current_turn
+
+    def get_free_columns(self):
+        return [i for i in range(7) if self._board[0][i] == 0]
+
     def display_board(self):
         self.screen.fill(BOARD_COLOR)
         x_csl = self.screen.get_width() / 7
@@ -127,6 +133,21 @@ class Connect4:
             return RED_COLOR
         return EMPTY_COLOR
 
+    def get_state(self):
+        return self._board
 
-game = Connect4()
-game.play()
+    def set_board(self, board):
+        self._board = board
+
+    def game_finish(self):
+        for i in range(6):
+            for j in range(7):
+                if self._board[i][j] != 0:
+                    if self.check_win((i, j)) is not None:
+                        return True
+        return False
+
+
+if __name__ == '__main__':
+    game = Connect4()
+    game.play()
