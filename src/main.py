@@ -1,5 +1,6 @@
 import random
 from copy import deepcopy
+from MCTS import MonteCarlo
 
 import pygame
 import sys
@@ -23,11 +24,16 @@ class Connect4:
         self.reset()
         self.last_move = None
 
-        self.clock = pygame.time.Clock()
-        self.screen = pygame.display.set_mode((700, 600))
         pygame.display.set_caption("Connect4")
 
     def play(self):
+
+        screen = pygame.display.set_mode((700, 600))
+        player_number = random.choice([1, -1])
+        ia_number = 1
+        if player_number == 1:
+            ia_number = -1
+
         game_over = False
         while True:
             for event in pygame.event.get():
@@ -37,28 +43,29 @@ class Connect4:
                     if event.key == pygame.K_SPACE and game_over:
                         self.reset()
                         game_over = False
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    if not game_over:
-                        posx, posy = pygame.mouse.get_pos()
-                        column_width = self.screen.get_width() / 7
-                        column = int(posx // column_width)
-                        next_empty_position = self.next_empty_position(column)
-                        if next_empty_position is not None:
-                            if next_empty_position is not None:
-                                self.make_move(column)
-                                result = self.check_win((next_empty_position, column))
-                                print(result)
-                            if result is not None:
-                                game_over = True
-                                if result == self._current_turn:
-                                    print(f"gg a {self.get_color_player()}")
-                                else:
-                                    print("it's a draw")
-                            else:
-                                self._current_turn *= -1
-                self.display_board()
-                pygame.display.flip()
-                self.clock.tick(60)
+
+            if self._current_turn == ia_number and not game_over:
+                print("tour de ia")
+                move = self.ia_play()
+                if self.check_win(move) == ia_number:
+                    game_over = True
+            elif self._current_turn == player_number and not game_over:
+                move = self.player_play(screen)
+                print("tour de joueur")
+                if self.check_win(move) == player_number:
+                    game_over = True
+            if self.game_finish():
+                game_over = True
+
+            if not game_over:
+                self._current_turn *= 1
+            self.display_board(screen)
+            pygame.display.flip()
+
+    def ia_play(self):
+        ia = MonteCarlo(self, 1000)
+        column = ia.monte_carlo_tree_search()
+        return self.make_move(column, self._current_turn)
 
     def next_empty_position(self, column):
         for i in range(len(self._board) - 1, -1, -1):
@@ -73,7 +80,6 @@ class Connect4:
 
     def reset(self):
         self._board = [[0 for _ in range(self._cols)] for _ in range(self._rows)]
-        print(self._board)
         self._current_turn = random.choice((-1, 1))
 
     def check_win(self, pos):
@@ -113,23 +119,36 @@ class Connect4:
 
         return None
 
-    def make_move(self, column):
+    def make_move(self, column, turn):
         r = self.next_empty_position(column)
-        self._board[r][column] = self._current_turn
+        self._board[r][column] = turn
         self.last_move = r, column
+        return r, column
 
     def get_free_columns(self):
         return [i for i in range(7) if self._board[0][i] == 0]
 
-    def display_board(self):
-        self.screen.fill(BOARD_COLOR)
-        x_csl = self.screen.get_width() / 7
-        y_scl = self.screen.get_height() / 6
+    def display_board(self, screen):
+        screen.fill(BOARD_COLOR)
+        x_csl = screen.get_width() / 7
+        y_scl = screen.get_height() / 6
         for i in range(6):
             for j in range(7):
                 number = self._board[i][j]
-                pygame.draw.circle(self.screen, self.get_color(number), (j * x_csl + x_csl / 2, i * y_scl + y_scl / 2),
+                pygame.draw.circle(screen, self.get_color(number), (j * x_csl + x_csl / 2, i * y_scl + y_scl / 2),
                                    40)
+
+    def player_play(self, screen):
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    posx, posy = pygame.mouse.get_pos()
+                    column_width = screen.get_width() / 7
+                    column = int(posx // column_width)
+                    next_empty_position = self.next_empty_position(column)
+                    if next_empty_position is not None:
+                        if next_empty_position is not None:
+                            return self.make_move(column, self._current_turn)
 
     @staticmethod
     def get_color(number):
@@ -145,6 +164,10 @@ class Connect4:
     def set_board(self, board):
         self._board = board
 
+    def print_board(self):
+        for row in self._board:
+            print(row)
+
     def game_finish(self):
         for i in range(6):
             for j in range(7):
@@ -152,8 +175,6 @@ class Connect4:
                     if self.check_win((i, j)) is not None:
                         return True
         return False
-
-
 
 
 if __name__ == '__main__':
