@@ -38,6 +38,7 @@ class Connect4:
         print(f"player color:{self.get_color_player(player_number)}")
 
         while True:
+            play = False
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sys.exit()
@@ -47,7 +48,9 @@ class Connect4:
                 if event.type == pygame.MOUSEBUTTONDOWN and self._current_turn == player_number and not self.game_over:
                     move = self.player_play(screen, pygame.mouse.get_pos())
                     self.next_turn(move)
-            if self._current_turn == ia_number and not self.game_over:
+                    play = True
+
+            if self._current_turn == ia_number and not self.game_over and not play:
                 move = self.ia_play()
                 self.next_turn(move)
 
@@ -70,7 +73,7 @@ class Connect4:
     def next_turn(self, move):
         if self.check_win(move):
             self.game_over = True
-            print(f"gg a {self.get_color(self._current_turn)}")
+            print(f"gg a {self.get_color_player(self._current_turn)}")
         elif self.game_finish():
             self.game_over = True
             print(f"it's a draw")

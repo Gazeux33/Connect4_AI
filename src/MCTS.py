@@ -48,7 +48,7 @@ class MonteCarlo:
         # return random.choice(self.root.state.get_free_columns())
         # pour le nombre d'iterations
         for i in range(self.iteration):
-            res = node, turn = self.selection(self.root, 1)  # on selectionne un noeud
+            node, turn = self.selection(self.root, 1)  # on selectionne un noeud
             reward = self.simulation(node, turn)  # puis on determine son score en le simulant
             self.backpropagation(node, reward, turn)  # on retropropage le resultat sur tous les parents
 
@@ -65,14 +65,11 @@ class MonteCarlo:
         return node, turn
 
     def simulation(self, node, turn):
-        node.state.print_board()
         state = node.state.copy_state()
-        state.print_board()
         while not state.game_finish():
             free_cols = state.get_free_columns()
             col = random.choice(free_cols)
             state.make_move(col, turn)
-            state.print_board()
             turn *= -1
 
         result = state.check_win(state.last_move)
