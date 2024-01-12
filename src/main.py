@@ -15,6 +15,12 @@ BOARD_COLOR = 0, 0, 255
 # yellow -> 1
 # red -> -1
 
+def get_color_player(number):
+    if number == -1:
+        return "red"
+    return "yellow"
+
+
 class Connect4:
     def __init__(self):
         self._rows = 6
@@ -34,8 +40,8 @@ class Connect4:
         if player_number == 1:
             ia_number = -1
 
-        print(f"ia color:{self.get_color_player(ia_number)}")
-        print(f"player color:{self.get_color_player(player_number)}")
+        print(f"ia color:{get_color_player(ia_number)}")
+        print(f"player color:{get_color_player(player_number)}")
 
         while True:
             play = False
@@ -73,7 +79,7 @@ class Connect4:
     def next_turn(self, move):
         if self.check_win(move):
             self.game_over = True
-            print(f"gg a {self.get_color_player(self._current_turn)}")
+            print(f"gg a {get_color_player(self._current_turn)}")
         elif self.game_finish():
             self.game_over = True
             print(f"it's a draw")
@@ -93,11 +99,6 @@ class Connect4:
             if self._board[i][column] == 0:
                 return i
         return None
-
-    def get_color_player(self, number):
-        if number == -1:
-            return "red"
-        return "yellow"
 
     def reset(self):
         self._board = [[0 for _ in range(self._cols)] for _ in range(self._rows)]
