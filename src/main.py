@@ -1,9 +1,11 @@
 import random
 from copy import deepcopy
-from MCTS import MonteCarlo
-
 import pygame
 import sys
+
+from MCTS import MonteCarlo
+
+
 
 pygame.init()
 YELLOW_COLOR = 220, 215, 20
