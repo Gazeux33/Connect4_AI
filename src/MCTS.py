@@ -2,7 +2,6 @@ import random
 import math
 
 
-
 class Node:
     def __init__(self, state, parent=None, column_play=None):
         self.parent = parent
@@ -45,6 +44,8 @@ class MonteCarlo:
         self.iteration = iteration  # le nombre d'iterations de recherches
 
     def monte_carlo_tree_search(self):
+
+        # return random.choice(self.root.state.get_free_columns())
         # pour le nombre d'iterations
         for i in range(self.iteration):
             res = node, turn = self.selection(self.root, 1)  # on selectionne un noeud
@@ -57,7 +58,7 @@ class MonteCarlo:
     def selection(self, node, turn):
         while not node.state.game_finish():
             if not node.fully_explored():
-                return self.expansion(node,turn), -1 * turn
+                return self.expansion(node, turn), -1 * turn
             else:
                 node = self.get_best_child(node)
                 turn *= -1
@@ -70,7 +71,7 @@ class MonteCarlo:
         while not state.game_finish():
             free_cols = state.get_free_columns()
             col = random.choice(free_cols)
-            state.make_move(col,turn)
+            state.make_move(col, turn)
             state.print_board()
             turn *= -1
 
@@ -84,13 +85,13 @@ class MonteCarlo:
             reward = 0
         return reward
 
-    def expansion(self, node,turn):
+    def expansion(self, node, turn):
         new_state = None
         free_columns = node.state.get_free_columns()
         for col in free_columns:
             if col not in node.children_moves:
                 new_state = node.state.copy_state()
-                new_state.make_move(col,turn)
+                new_state.make_move(col, turn)
                 break
         node.add_child(new_state, col)
         return node.children[-1]
@@ -118,8 +119,3 @@ class MonteCarlo:
                 best_score = score
         res = random.choice(best_children)
         return res
-
-
-
-
-
