@@ -73,10 +73,10 @@ class MonteCarlo:
             turn *= -1
 
         result = state.check_win(state.last_move)
-        reward_bool = result == 1 or result == -1
-        if reward_bool and turn == -1:
+
+        if result and turn == -1:
             reward = 1
-        elif reward_bool and turn == 1:
+        elif result and turn == 1:
             reward = -1
         else:
             reward = 0
